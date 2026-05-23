@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Synapse — Daily Reading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0f0f;
+    --bg-card: #161718;
+    --bg-card-hover: #1d1e20;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.16);
+    --text-primary: #e8e4dc;
+    --text-secondary: #8a877f;
+    --text-muted: #4a4845;
+    --accent-gold: #c9a84c;
+    --accent-gold-dim: rgba(201,168,76,0.12);
+    --accent-teal: #4a9e8a;
+    --accent-teal-dim: rgba(74,158,138,0.1);
+    --accent-blue: #5b8ccc;
+    --accent-blue-dim: rgba(91,140,204,0.1);
+    --accent-rose: #c4706a;
+    --accent-rose-dim: rgba(196,112,106,0.1);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+    padding-bottom: 4rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 3rem 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+  .wordmark {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: var(--text-primary);
+  }
+  .wordmark em { font-style: italic; color: var(--accent-gold); }
+  #clock {
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+
+  .section { margin-bottom: 3rem; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+  .section-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .card {
+    background: var(--bg-card);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.18s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px;
+    height: 100%;
+    background: transparent;
+    transition: background 0.18s ease;
+  }
+  .card:hover { background: var(--bg-card-hover); }
+  .card[data-accent="gold"]::before { --stripe: var(--accent-gold); }
+  .card[data-accent="teal"]::before { --stripe: var(--accent-teal); }
+  .card[data-accent="blue"]::before { --stripe: var(--accent-blue); }
+  .card[data-accent="rose"]::before { --stripe: var(--accent-rose); }
+  .card:hover::before { background: var(--stripe); }
+
+  .card-name {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--text-primary);
+    transition: color 0.18s ease;
+  }
+  .card[data-accent="gold"]:hover .card-name { color: var(--accent-gold); }
+  .card[data-accent="teal"]:hover .card-name  { color: var(--accent-teal); }
+  .card[data-accent="blue"]:hover .card-name  { color: var(--accent-blue); }
+  .card[data-accent="rose"]:hover .card-name  { color: var(--accent-rose); }
+
+  .card-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+  .card-arrow {
+    margin-top: 0.6rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: color 0.18s ease, letter-spacing 0.18s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .card-arrow svg { width: 10px; height: 10px; transition: transform 0.18s ease; }
+  .card:hover .card-arrow { color: var(--text-secondary); letter-spacing: 0.14em; }
+  .card:hover .card-arrow svg { transform: translate(2px, -2px); }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">Syn<em>apse</em></div>
+  <div id="clock"></div>
+</header>
+
+<main id="main"></main>
+
+<footer>
+  <span>Your curated reading layer</span>
+  <span id="link-count"></span>
+</footer>
+
+<script>
+const sources = [
+  {
+    section: "Finance & Markets",
+    accent: "gold",
+    dotColor: "#c9a84c",
+    links: [
+      { name: "BlackRock Insights", desc: "Global investment management and institutional research.", url: "https://www.blackrock.com/institutions/en-global/institutional-insights" },
+      { name: "The Daily Brief", desc: "Zerodha's brief on markets and the economy — essential for Indian context.", url: "https://thedailybrief.zerodha.com/" },
+      { name: "Howard Marks Memos", desc: "Investment memos on market cycles, risk, and strategy from Oaktree Capital.", url: "https://www.oaktreecapital.com/insights/memos" },
+      { name: "Collaborative Fund", desc: "Morgan Housel and team on investing, business, and human behavior.", url: "https://collabfund.substack.com/" },
+      { name: "Avendus Insights", desc: "Equity research, new deals, and market intelligence.", url: "https://www.avendus.com/insights" },
+      { name: "Houlihan Lokey Insights", desc: "Specialized research reports, market trends, and transaction insights.", url: "https://hl.com/insights/" },
+    ]
+  },
+  {
+    section: "Strategy & Decision-Making",
+    accent: "teal",
+    dotColor: "#4a9e8a",
+    links: [
+      { name: "Farnam Street", desc: "Timeless writing on mental models, decision-making, and clear thinking.", url: "https://fs.blog/" },
+      { name: "The Polymath Investor", desc: "In-depth investment analysis and business strategy commentary.", url: "https://substack.com/@polymathinvestor" },
+      { name: "IIM Calcutta Case Studies", desc: "Management case studies and business insights from India's top B-school.", url: "https://www.iimcal.ac.in/case-studies-lists" },
+    ]
+  },
+  {
+    section: "Ideas & Philosophy",
+    accent: "blue",
+    dotColor: "#5b8ccc",
+    links: [
+      { name: "Aeon", desc: "Profound essays on philosophy, science, and the human condition.", url: "https://aeon.co/" },
+      { name: "The Yale Review", desc: "Literature, culture, and ideas from one of the oldest literary journals.", url: "https://yalereview.org/" },
+      { name: "Stanford Encyclopedia of Philosophy", desc: "Peer-reviewed deep dives into every corner of philosophical thought.", url: "https://plato.stanford.edu/" },
+    ]
+  }
+];
+
+function buildDashboard() {
+  const main = document.getElementById('main');
+  let totalLinks = 0;
+  sources.forEach(section => {
+    totalLinks += section.links.length;
+    const sec = document.createElement('section');
+    sec.className = 'section';
+    sec.innerHTML = `
+      <div class="section-header">
+        <span class="section-dot" style="background:${section.dotColor}"></span>
+        <span class="section-label">${section.section}</span>
+        <div class="section-line"></div>
+      </div>
+      <div class="grid"></div>
+    `;
+    const grid = sec.querySelector('.grid');
+    section.links.forEach(link => {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = link.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.setAttribute('data-accent', section.accent);
+      a.innerHTML = `
+        <div class="card-name">${link.name}</div>
+        <div class="card-desc">${link.desc}</div>
+        <div class="card-arrow">Open
+          <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M1 9L9 1M9 1H3M9 1V7"/>
+          </svg>
+        </div>
+      `;
+      grid.appendChild(a);
+    });
+    main.appendChild(sec);
+  });
+  document.getElementById('link-count').textContent = `${totalLinks} sources`;
+}
+
+function updateClock() {
+  const el = document.getElementById('clock');
+  if (!el) return;
+  const now = new Date();
+  const opts = { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false };
+  el.textContent = now.toLocaleString('en-IN', opts).replace(',', ' ·');
+}
+
+buildDashboard();
+updateClock();
+setInterval(updateClock, 15000);
+</script>
+</body>
+</html>
